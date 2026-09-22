@@ -1,0 +1,16 @@
+/* Element Plus 默认是浅色主题，这里集中覆盖为工作台的暗色视觉。 */
+.el-select, .el-input-number, .el-input { width: 100%; }
+.el-select__wrapper, .el-input__wrapper, .el-textarea__inner { background: var(--field) !important; box-shadow: 0 0 0 1px var(--border) inset !important; }
+.el-select__wrapper:hover, .el-input__wrapper:hover, .el-textarea__inner:hover { box-shadow: 0 0 0 1px #465667 inset !important; }
+.el-input__inner, .el-textarea__inner, .el-select__selected-item { color: #dfe6ec !important; }
+.el-input-number .el-input__inner { text-align: left; }
+.el-button { border-color: #34414f; background: #27313e; color: #e8edf1; font-weight: 700; }
+.el-button:hover { border-color: #536273; background: #303c49; color: #fff; }
+.el-button--primary { border-color: #24ceb0; background: #24c9aa; color: #08201b; }
+.el-button--primary:hover { border-color: #49e0c4; background: #3bd9bc; color: #061712; }
+.el-button--danger { border-color: var(--danger); background: var(--danger); color: #24080b; }
+.el-button--danger:hover { border-color: #ff7b85; background: #ff707b; color: #24080b; }
+.el-checkbox { --el-checkbox-checked-bg-color: var(--primary); --el-checkbox-checked-input-border-color: var(--primary); --el-checkbox-checked-text-color: #aebbc5; color: #8996a2; }
+.el-popper.is-light { border-color: #34404c !important; background: #18212b !important; }
+.el-select-dropdown__item { color: #cfd8e0 !important; }
+.el-select-dropdown__item.is-hovering, .el-select-dropdown__item.is-selected { background: #24313d !important; color: var(--primary) !important; }
