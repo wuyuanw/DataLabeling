@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { REVIEW_STATUS_META } from '../../constants/annotation'
 
 const props = defineProps({
   projects: { type: Array, required: true },
@@ -27,13 +28,12 @@ const emit = defineEmits([
 ])
 
 const filteredItems = computed(() => {
-  if (props.queueFilter === 'unlabeled') {
-    return props.queueItems
-      .map((item, index) => ({ item, index }))
-      .filter(({ item }) => !item.boxes?.length)
-  }
-  return props.queueItems.map((item, index) => ({ item, index }))
+  const entries = props.queueItems.map((item, index) => ({ item, index }))
+  if (props.queueFilter === 'all') return entries
+  return entries.filter(({ item }) => item.reviewStatus === props.queueFilter)
 })
+
+const statusMeta = (status) => REVIEW_STATUS_META[status] || REVIEW_STATUS_META.pending
 
 function emitSelectedImage(event) {
   const file = event.target.files?.[0]
@@ -128,7 +128,10 @@ function emitSelectedImage(event) {
       <h2>图片队列</h2>
       <div class="segmented">
         <button :class="{ active: queueFilter === 'all' }" @click="emit('update:queueFilter', 'all')">全部</button>
-        <button :class="{ active: queueFilter === 'unlabeled' }" @click="emit('update:queueFilter', 'unlabeled')">未标注</button>
+        <button :class="{ active: queueFilter === 'pending' }" @click="emit('update:queueFilter', 'pending')">待审核</button>
+        <button :class="{ active: queueFilter === 'modified' }" @click="emit('update:queueFilter', 'modified')">已修改</button>
+        <button :class="{ active: queueFilter === 'reviewed' }" @click="emit('update:queueFilter', 'reviewed')">已审核</button>
+        <button :class="{ active: queueFilter === 'no_target' }" @click="emit('update:queueFilter', 'no_target')">无目标</button>
         <button @click="emit('refreshQueue')">刷新</button>
       </div>
       <div class="queue-list">
@@ -139,7 +142,11 @@ function emitSelectedImage(event) {
           :class="{ active: currentQueueIndex === entry.index }"
           @click="emit('openQueueItem', entry.index)"
         >
-          <span>{{ entry.item.fileName }}</span><b>{{ entry.item.boxes?.length || 0 }}</b>
+          <span>{{ entry.item.fileName }}</span>
+          <small :class="'status-' + entry.item.reviewStatus">
+            {{ entry.item.dirty ? '未保存' : statusMeta(entry.item.reviewStatus).label }}
+          </small>
+          <b>{{ entry.item.boxes?.length || 0 }}</b>
         </button>
         <div v-if="!filteredItems.length && imageName" class="queue-item standalone"><span>{{ imageName }}</span></div>
         <p v-if="!filteredItems.length && !imageName" class="queue-empty">暂无图片</p>
@@ -168,13 +175,16 @@ function emitSelectedImage(event) {
 .job-actions { display: flex; gap: 7px; }
 .job-progress { margin-top: 10px; padding: 8px; border-radius: 5px; background: #111820; }
 .job-progress p { margin: 5px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #8493a1; font-size: 11px; }
-.segmented { display: flex; gap: 4px; }
+.segmented { display: flex; flex-wrap: wrap; gap: 4px; }
 .segmented button { padding: 8px 10px; border: 1px solid transparent; border-radius: 4px; background: #27313e; font-weight: 700; cursor: pointer; }
 .segmented button:hover, .segmented button.active { color: var(--primary); border-color: #2dbb9f66; background: #152d2a; }
 .queue-list { max-height: 180px; margin-top: 8px; overflow-y: auto; }
 .queue-item { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; padding: 8px; border: 1px solid #27323e; border-radius: 4px; background: #111820; color: #d5dde4; font-size: 12px; cursor: pointer; }
 .queue-item:hover, .queue-item.active { border-color: #35cdb388; background: #16302d; }
 .queue-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.queue-item small { margin-left: auto; padding: 2px 5px; border-radius: 3px; color: #8f9ba7; background: #252e38; white-space: nowrap; }
+.queue-item small.status-modified { color: #f6c85f; background: #3b321c; }
+.queue-item small.status-reviewed, .queue-item small.status-no_target { color: #59dfbf; background: #17362f; }
 .queue-item b { color: var(--primary); }
 .queue-item.standalone { cursor: default; }
 .queue-empty { margin: 12px 0 2px; color: #73808d; font-size: 12px; text-align: center; }

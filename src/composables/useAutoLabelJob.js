@@ -1,6 +1,30 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { autoLabelService } from '../services/autoLabelService'
+import { REVIEW_STATUS } from '../constants/annotation'
+
+function createBoxId() {
+  return globalThis.crypto?.randomUUID?.() ?? String(Date.now()) + '-' + String(Math.random())
+}
+
+/** 将 Python 推理结果补充为前端可编辑、可审核的数据结构。 */
+function createQueueItem(event) {
+  const boxes = (event.boxes || []).map((box) => ({
+    ...box,
+    id: createBoxId(),
+    source: 'model',
+  }))
+
+  return {
+    ...event,
+    boxes,
+    originalBoxes: boxes.map((box) => ({ ...box })),
+    reviewStatus: REVIEW_STATUS.PENDING,
+    dirty: false,
+    savedAt: null,
+    reviewedAt: null,
+  }
+}
 
 /** 管理自动标注任务的文件选择、运行状态、进度与输出项。 */
 export function useAutoLabelJob() {
@@ -146,7 +170,7 @@ export function useAutoLabelJob() {
       phase.value = event.phase
       current.value = event.current
       total.value = event.total
-      items.value.push(event)
+      items.value.push(createQueueItem(event))
     } else if (event.type === 'done') {
       status.value = 'completed'
       outputDirectory.value = event.outputDir

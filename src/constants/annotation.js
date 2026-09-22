@@ -41,3 +41,18 @@ export const DEFAULT_EXTRACTION_FORM = Object.freeze({
   device: 'auto',
   ratio: 0.2,
 })
+
+/** 图片人工复核状态；保存标签与完成复核是两个独立动作。 */
+export const REVIEW_STATUS = Object.freeze({
+  PENDING: 'pending',
+  MODIFIED: 'modified',
+  REVIEWED: 'reviewed',
+  NO_TARGET: 'no_target',
+})
+
+export const REVIEW_STATUS_META = Object.freeze({
+  [REVIEW_STATUS.PENDING]: { label: '待审核', type: 'info' },
+  [REVIEW_STATUS.MODIFIED]: { label: '已修改', type: 'warning' },
+  [REVIEW_STATUS.REVIEWED]: { label: '已审核', type: 'success' },
+  [REVIEW_STATUS.NO_TARGET]: { label: '无目标', type: 'success' },
+})

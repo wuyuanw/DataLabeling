@@ -171,6 +171,14 @@ def convert_box_to_ui(
     }
 
 
+def get_source_frame(image_path: Path) -> int | None:
+    """从 frame_00000123.jpg 中恢复原视频帧号。"""
+    try:
+        return int(image_path.stem.rsplit("_", 1)[-1])
+    except ValueError:
+        return None
+
+
 def run_inference(
     model: YOLO,
     image_paths: list[Path],
@@ -238,6 +246,7 @@ def run_inference(
             total=len(image_paths),
             fileName=image_path.name,
             labelFileName=label_path.name,
+            sourceFrame=get_source_frame(image_path),
             boxCount=box_count,
             boxes=ui_boxes,
         )
@@ -264,6 +273,7 @@ def register_unlabeled_frames(
             total=len(image_paths),
             fileName=image_path.name,
             labelFileName=label_path.name,
+            sourceFrame=get_source_frame(image_path),
             boxCount=0,
             boxes=[],
         )
